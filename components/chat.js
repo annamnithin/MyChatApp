@@ -110,8 +110,55 @@ export default class Chat extends Component {
         };
 
         return PermissionAndroid.request(
-            PermissionAndroid.PERMISSIONS.RECORD_AUDIO
-        )
+            PermissionAndroid.PERMISSIONS.RECORD_AUDIO,
+            rationale
+        ).then(result => {
+            console.log("Permission resukt: ",result);
+            return result === true || result === PermissionAndroid.RESULTS.GRANTED;
+        });
+    }
+
+    renderAudio = props => {
+        return !props.currentMessage.audio? (
+            <View/>
+        ):(
+            <Ionicons
+                name = "ios-play"
+                size = {35}
+                color = {this.state.playAudio? "red": "blue"}
+                style = {{
+                    left : 90,
+                    position: "relative",
+                    shadowColor : "#000",
+                    shadowOffSet : {width: 0, height: 0},
+                    shadowOpacity: 0.5,
+                    backgroundColor : "transparent"
+                }}
+                onPress = {() => {
+                    this.setState({
+                        playAudio: true
+                    });
+
+                    const sound = new Sound(props.currentMessage.audio, "", error => {
+                        if(error){
+                            console.log("failed to load the sound", error);
+                            
+                        }
+                        this.setState({playAudio: false});
+                        sound.play(success => {
+                            console.log("success play", success);
+                            if(!success){
+                                Alert.alert("there was a error playing this audio");
+                            }
+                        });
+                    });
+                }}
+                />
+        );
+    };
+
+    renderBubble = props => {
+        
     }
 }
 
